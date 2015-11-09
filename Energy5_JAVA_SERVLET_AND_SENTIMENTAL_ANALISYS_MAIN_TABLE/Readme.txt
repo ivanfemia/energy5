@@ -1,0 +1,31 @@
+This is a java servlet that connect to twitter, get all the tweets with the keyword "energy5" and push them on an HCP table (in delta mode using the last refresh timestamp).
+
+To make it working you need to deploy it in SAP HCP, create the following tables, and bind the right database to the application.
+
+TWEETS TABLE
+
+CREATE COLUMN TABLE "D045495"."TWEETS" ("ID" INTEGER CS_INT NOT NULL , "USER_NAME" NVARCHAR(100), "CREATED_AT" DAYDATE CS_DAYDATE, "TEXT" NVARCHAR(180), "HASH_TAGS" NVARCHAR(100), "LATITUDE" DOUBLE CS_DOUBLE, "LONGITUDE" DOUBLE CS_DOUBLE, "CREATION_TIME" SECONDTIME CS_SECONDTIME, PRIMARY KEY ("ID")) UNLOAD PRIORITY 5  AUTO MERGE  GROUP NAME "$TA_D045495_TWEETS";
+CREATE FULLTEXT INDEX "TWEETS_FTI" ON "D045495"."TWEETS" ("TEXT") CONFIGURATION 'EXTRACTION_CORE_VOICEOFCUSTOMER' ASYNC LANGUAGE DETECTION ('EN') PHRASE INDEX RATIO 0.200000 FUZZY SEARCH INDEX OFF SEARCH ONLY ON FAST PREPROCESS OFF TEXT MINING OFF TEXT ANALYSIS ON TOKEN SEPARATORS '\/;,.:-_()[]<>!?*@+{}="&#$~|'
+
+LAST_REFRESH_NEW TABLE
+
+CREATE ROW TABLE "D045495"."LAST_REFRESH_NEW"  ( "ID" INT CS_INT, "TIMESTAMP" LONGDATE CS_LONGDATE, PRIMARY KEY ( "ID" ) ) 
+
+TWO SEQUENCES:
+
+LAST_REFRESH_NEW_SEQ and TWEET_SEQUENCE
+
+(CREATE SEQUENCE <SCHEMA_NAME>."SEQ_NAME" 
+     INCREMENT BY 1 START WITH 1 NO CYCLE; )
+
+----------
+
+
+In order to make sentimental data analisys you can use the native HANA support creating the following table:
+
+Create FullText Index <Scheme_Name>."TWEETS_FTI" 
+On <Scheme_Name>."TWEETS"("TEXT") 
+TEXT ANALYSIS ON 
+CONFIGURATION 'EXTRACTION_CORE_VOICEOFCUSTOMER';
+
+And then generate some view and UI based on this table.
