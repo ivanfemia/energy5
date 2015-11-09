@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="COMPANY_TILE" applyPrivilegeType="ANALYTIC_PRIVILEGE" dataCategory="CUBE" schemaVersion="2.3" defaultClient="$$client$$" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="COMPANY_TILE"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="icon" datatype="NVARCHAR" length="100"/>
+    
+      <viewAttribute id="info" datatype="NVARCHAR" length="40"/>
+      <viewAttribute id="infoState" datatype="NVARCHAR" length="20"/>
+      <viewAttribute id="number" datatype="DECIMAL" length="3" scale="2"/>
+      <viewAttribute id="numberDigits" datatype="INTEGER"/>
+      <viewAttribute id="numberFactor" datatype="NVARCHAR" length="2"/>
+      <viewAttribute id="numberState" datatype="NVARCHAR" length="30"/>
+      <viewAttribute id="numberUnit" datatype="NVARCHAR" length="2"/>
+      <viewAttribute id="stateArrow" datatype="NVARCHAR" length="10"/>
+      <viewAttribute id="subtitle" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="title" datatype="NVARCHAR" length="100"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+   var_out = 
+   select 'sap-icon://world' as &quot;icon&quot;,
+            '1.000 - Good, 0 - Bad' as  &quot;info&quot;,
+            'Critical' as  &quot;infoState&quot;,
+            &quot;ACTUAL&quot;.&quot;SCORE&quot; as &quot;number&quot;,
+            2 as &quot;numberDigits&quot;,
+            '' as &quot;numberFactor&quot;,
+            CASE WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt; 9 THEN  'Positive'
+                 WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt; 5 THEN  'Neutral'
+                 WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt;= 2 THEN 'Negative'
+                 WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &lt; 2 THEN  'Critical'
+            END as &quot;numberState&quot;,
+            '' as &quot;numberUnit&quot;,
+            CASE WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt; &quot;PREVIOUS&quot;.&quot;SCORE&quot; THEN 'Up'
+                WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; = &quot;PREVIOUS&quot;.&quot;SCORE&quot; THEN 'None'
+                WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &lt; &quot;PREVIOUS&quot;.&quot;SCORE&quot; THEN 'Down'
+            END AS &quot;stateArrow&quot;,
+            'Twitter, Facebook, G+' as &quot;subtitle&quot;,
+            'Social sentiment' as &quot;title&quot; 
+FROM 
+(
+SELECT 100*(SUM(&quot;SCORE&quot;)+(COUNT(&quot;SCORE&quot;)*3))/(COUNT(&quot;SCORE&quot;)*2*3)*10 AS &quot;SCORE&quot;
+FROM  &quot;D045495&quot;.&quot;TWEETS&quot; as &quot;tweets&quot;
+INNER JOIN &quot;_SYS_BIC&quot;.&quot;energy5.views/TWEET_SCORED&quot; as &quot;score&quot; ON ( &quot;tweets&quot;.ID = &quot;score&quot;.ID )
+WHERE DAYOFMONTH  (NOW()) - DAYOFMONTH  (&quot;CREATED_AT&quot;) = 0
+) AS &quot;ACTUAL&quot;,
+(
+SELECT 100*(SUM(&quot;SCORE&quot;)+(COUNT(&quot;SCORE&quot;)*3))/(COUNT(&quot;SCORE&quot;)*2*3)*10 AS &quot;SCORE&quot;
+FROM  &quot;D045495&quot;.&quot;TWEETS&quot; as &quot;tweets&quot;
+INNER JOIN &quot;_SYS_BIC&quot;.&quot;energy5.views/TWEET_SCORED&quot; as &quot;score&quot; ON ( &quot;tweets&quot;.ID = &quot;score&quot;.ID )
+WHERE DAYOFMONTH  (NOW()) - DAYOFMONTH  (&quot;CREATED_AT&quot;) &gt; 0
+) AS &quot;PREVIOUS&quot;
+
+UNION
+
+select 'sap-icon://world' as &quot;icon&quot;,
+        'Number of Tweets' as  &quot;info&quot;,
+        'Critical' as  &quot;infoState&quot;,
+        &quot;ACTUAL&quot;.&quot;SCORE&quot; as &quot;number&quot;,
+        2 as &quot;numberDigits&quot;,
+        '' as &quot;numberFactor&quot;,
+        CASE WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt; 9 THEN  'Positive'
+             WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt; 5 THEN  'Neutral'
+             WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt;= 2 THEN 'Negative'
+             WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &lt; 2 THEN  'Critical'
+        END as &quot;numberState&quot;,
+        '' as &quot;numberUnit&quot;,
+        CASE WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &gt; &quot;PREVIOUS&quot;.&quot;SCORE&quot; THEN 'Up'
+            WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; = &quot;PREVIOUS&quot;.&quot;SCORE&quot; THEN 'None'
+            WHEN &quot;ACTUAL&quot;.&quot;SCORE&quot; &lt; &quot;PREVIOUS&quot;.&quot;SCORE&quot; THEN 'Down'
+        END AS &quot;stateArrow&quot;,
+        'Live Tweets worldwide' as &quot;subtitle&quot;,
+        'Twitter Map' as &quot;title&quot; 
+FROM 
+(
+SELECT COUNT(&quot;ID&quot;) AS &quot;SCORE&quot;
+FROM  &quot;D045495&quot;.&quot;TWEETS&quot; as &quot;tweets&quot;
+WHERE DAYOFMONTH  (NOW()) - DAYOFMONTH  (&quot;CREATED_AT&quot;) = 0
+) AS &quot;ACTUAL&quot;,
+(
+SELECT COUNT(&quot;ID&quot;) AS &quot;SCORE&quot;
+FROM  &quot;D045495&quot;.&quot;TWEETS&quot; as &quot;tweets&quot;
+WHERE DAYOFMONTH  (NOW()) - DAYOFMONTH  (&quot;CREATED_AT&quot;) = 1
+) AS &quot;PREVIOUS&quot;;  
+
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes>
+    <attribute id="info" order="2">
+      <descriptions/>
+      <keyMapping columnObjectName="Script_View" columnName="info"/>
+    </attribute>
+    <attribute id="infoState" order="3">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="infoState"/>
+    </attribute>
+    <attribute id="number" order="4">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="number"/>
+    </attribute>
+    <attribute id="numberDigits" order="5">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="numberDigits"/>
+    </attribute>
+    <attribute id="numberFactor" order="6">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="numberFactor"/>
+    </attribute>
+    <attribute id="numberState" order="7">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="numberState"/>
+    </attribute>
+    <attribute id="numberUnit" order="8">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="numberUnit"/>
+    </attribute>
+    <attribute id="stateArrow" order="9">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="stateArrow"/>
+    </attribute>
+    <attribute id="subtitle" order="10">
+      <descriptions defaultDescription="COL"/>
+      <keyMapping columnObjectName="Script_View" columnName="subtitle"/>
+    </attribute>
+    <attribute id="title" order="11">
+      <descriptions/>
+      <keyMapping columnObjectName="Script_View" columnName="title"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="icon" order="1" aggregationType="count" measureType="simple">
+      <descriptions defaultDescription="COL"/>
+      <measureMapping columnObjectName="Script_View" columnName="icon"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

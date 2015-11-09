@@ -1,0 +1,9 @@
+service {
+    "energy5.views::COMPANY_TILE" as "company_tile" keys ( "title" );
+    "energy5.views::COMPANY_SENTIMENT" as "company_overview" keys ( "TA_TYPE" );
+    "energy5.views::COMPANY_SENTIMENT_BY_TYPE" as "company_counter" keys ( "TA_TYPE" );
+    "energy5.views::USER_SENTIMENT" as "user_overview" keys ( "ID" );
+    "energy5.views::USER_SENTIMENT_BY_DAY" as "user_day" keys ( "ID", "DAY", "TA_TYPE" );
+    "energy5.views::USER_SENTIMENT_BY_TIME" as "user_time" keys ( "ID", "CREATED_AT", "TA_TYPE" );
+    "energy5.views::USER_SENTIMENT_BY_TYPE" as "user_type" keys ( "ID", "TA_TYPE" );
+}

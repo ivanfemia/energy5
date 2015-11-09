@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="USER_SENTIMENT_BY_TIME" applyPrivilegeType="ANALYTIC_PRIVILEGE" dataCategory="CUBE" schemaVersion="2.3" defaultClient="$$client$$" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="USER_SENTIMENT_BY_TIME"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="ID" datatype="NVARCHAR" length="200"/>
+      <viewAttribute id="USER_NAME" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="TA_TYPE" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="SENTIMENT_VALAUE_PERCENTAGE" datatype="DECIMAL" length="3" scale="2"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+   var_out = SELECT TABLE1.&quot;ID&quot;, TABLE1.&quot;USER_NAME&quot;, TABLE1.&quot;TA_TYPE&quot;, ROUND(&quot;SENTIMENT_VALUE&quot;/ &quot;TOTAL_SENTIMENT_VALAUE&quot; * 100,2) AS &quot;SENTIMENT_VALAUE_PERCENTAGE&quot; 
+FROM 
+(  
+SELECT tweets.ID, tweets.USER_NAME, ta_tweets.&quot;TA_TYPE&quot;, SUM(ta_tweets.&quot;TA_COUNTER&quot;) AS &quot;SENTIMENT_VALUE&quot; 
+     FROM &quot;D045495&quot;.&quot;$TA_TWEETS_FTI&quot; as ta_tweets INNER JOIN  &quot;D045495&quot;.&quot;TWEETS&quot; as tweets ON ( tweets.ID = ta_tweets.ID )
+    where TA_TYPE in('WeakPositiveSentiment','StrongPositiveSentiment','NeutralSentiment',
+       'WeakNegativeSentiment','StrongNegativeSentiment','MajorProblem','MinorProblem')
+    GROUP BY tweets.ID, tweets.USER_NAME, &quot;TA_TYPE&quot;,CONCAT(CONCAT(TO_VARCHAR(&quot;CREATED_AT&quot;,'D'),TO_VARCHAR(&quot;CREATED_AT&quot;,'MON')),TO_VARCHAR(&quot;CREATED_AT&quot;,'YYYY'))
+) AS TABLE1,
+
+(
+SELECT tweets.ID, tweets.USER_NAME,
+    SUM(&quot;TA_COUNTER&quot;) AS &quot;TOTAL_SENTIMENT_VALAUE&quot;
+     FROM &quot;D045495&quot;.&quot;$TA_TWEETS_FTI&quot; as ta_tweets INNER JOIN  &quot;D045495&quot;.&quot;TWEETS&quot; as tweets ON ( tweets.ID = ta_tweets.ID )
+    where TA_TYPE in('WeakPositiveSentiment','StrongPositiveSentiment','NeutralSentiment',
+       'WeakNegativeSentiment','StrongNegativeSentiment','MajorProblem','MinorProblem')
+    GROUP BY tweets.ID, tweets.USER_NAME, CONCAT(CONCAT(TO_VARCHAR(&quot;CREATED_AT&quot;,'D'),TO_VARCHAR(&quot;CREATED_AT&quot;,'MON')),TO_VARCHAR(&quot;CREATED_AT&quot;,'YYYY'))
+) AS TABLE2
+
+WHERE TABLE1.ID = TABLE2.ID;
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes>
+    <attribute id="ID" order="1">
+      <descriptions/>
+      <keyMapping columnObjectName="Script_View" columnName="ID"/>
+    </attribute>
+    <attribute id="TA_TYPE" order="3">
+      <descriptions/>
+      <keyMapping columnObjectName="Script_View" columnName="TA_TYPE"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="USER_NAME" order="2" aggregationType="count" measureType="simple">
+      <descriptions defaultDescription="COL"/>
+      <measureMapping columnObjectName="Script_View" columnName="USER_NAME"/>
+    </measure>
+    <measure id="SENTIMENT_VALAUE_PERCENTAGE" order="4" aggregationType="sum" measureType="simple">
+      <descriptions/>
+      <measureMapping columnObjectName="Script_View" columnName="SENTIMENT_VALAUE_PERCENTAGE"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

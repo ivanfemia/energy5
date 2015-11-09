@@ -1,0 +1,3 @@
+service {
+    "D045495"."TWEETS" as "tweets";
+}

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="TWEET_SCORED" applyPrivilegeType="ANALYTIC_PRIVILEGE" dataCategory="CUBE" schemaVersion="2.3" defaultClient="$$client$$" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="TWEET_SCORED"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="ID" datatype="INTEGER"/>
+    
+      <viewAttribute id="SCORE" datatype="INTEGER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+   var_out = SELECT &quot;ID&quot;, CASE WHEN &quot;ta&quot;.TA_TYPE = 'MajorProblem' THEN -3
+                  WHEN &quot;ta&quot;.TA_TYPE = 'StrongNegativeSentiment' THEN -2 
+                  WHEN &quot;ta&quot;.TA_TYPE = 'MinorProblem' THEN -1
+                  WHEN &quot;ta&quot;.TA_TYPE = 'WeakNegativeSentiment' THEN 0
+                  WHEN &quot;ta&quot;.TA_TYPE = 'NeutralSentiment' THEN 1
+                  WHEN &quot;ta&quot;.TA_TYPE = 'WeakPositiveSentiment' THEN 2
+                  WHEN &quot;ta&quot;.TA_TYPE = 'StrongPositiveSentiment' THEN 3
+             END AS &quot;SCORE&quot;
+FROM &quot;D045495&quot;.&quot;$TA_TWEETS_FTI&quot; as &quot;ta&quot;
+WHERE &quot;ta&quot;.TA_TYPE in('WeakPositiveSentiment','StrongPositiveSentiment','NeutralSentiment',
+       'WeakNegativeSentiment','StrongNegativeSentiment','MajorProblem','MinorProblem');
+
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes/>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="ID" order="1" aggregationType="count" measureType="simple">
+      <descriptions defaultDescription="COL"/>
+      <measureMapping columnObjectName="Script_View" columnName="ID"/>
+    </measure>
+  
+    <measure id="SCORE" order="2" aggregationType="sum" measureType="simple">
+      <descriptions/>
+      <measureMapping columnObjectName="Script_View" columnName="SCORE"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

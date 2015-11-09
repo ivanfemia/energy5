@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="USER_SENTIMENT_BY_TIME" applyPrivilegeType="ANALYTIC_PRIVILEGE" dataCategory="CUBE" schemaVersion="2.3" defaultClient="$$client$$" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="USER_SENTIMENT_BY_TIME"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="TA_TYPE" datatype="NVARCHAR" length="100"/>
+      <viewAttribute id="COUNTER" datatype="INTEGER"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+   var_out = SELECT &quot;TA_TYPE&quot;, COUNT(&quot;TA_COUNTER&quot;) AS &quot;COUNTER&quot; 
+     FROM &quot;D045495&quot;.&quot;$TA_TWEETS_FTI&quot;
+    where TA_TYPE in('WeakPositiveSentiment','StrongPositiveSentiment','NeutralSentiment',
+       'WeakNegativeSentiment','StrongNegativeSentiment','MajorProblem','MinorProblem')
+    GROUP BY &quot;TA_TYPE&quot;;
+
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes>
+    <attribute id="TA_TYPE" order="1">
+      <descriptions/>
+      <keyMapping columnObjectName="Script_View" columnName="TA_TYPE"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="COUNTER" order="2" aggregationType="sum" measureType="simple">
+      <descriptions/>
+      <measureMapping columnObjectName="Script_View" columnName="COUNTER"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

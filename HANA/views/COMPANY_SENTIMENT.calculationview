@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="COMPANY_SENTIMENT" applyPrivilegeType="ANALYTIC_PRIVILEGE" dataCategory="CUBE" schemaVersion="2.3" defaultClient="$$client$$" visibility="reportingEnabled" calculationScenarioType="SCRIPT_BASED" scriptParametersCaseSensitive="true" enforceSqlExecution="false">
+<descriptions defaultDescription="COMPANY_SENTIMENT"/>
+<localVariables/>
+<variableMappings/>
+<dataSources/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:SqlScriptView" id="Script_View">
+    <viewAttributes>
+      <viewAttribute id="TA_TYPE" datatype="NVARCHAR" length="100"/>
+    
+      <viewAttribute id="SENTIMENT_VALAUE_PERCENTAGE" datatype="DECIMAL" length="3" scale="2"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <definition>/********* Begin Procedure Script ************/ 
+BEGIN 
+   var_out = SELECT &quot;TA_TYPE&quot;, ROUND(&quot;SENTIMENT_VALUE&quot;/ &quot;TOTAL_SENTIMENT_VALAUE&quot; * 100,2) AS &quot;SENTIMENT_VALAUE_PERCENTAGE&quot; 
+FROM 
+( 
+SELECT &quot;TA_TYPE&quot;, SUM(&quot;TA_COUNTER&quot;) AS &quot;SENTIMENT_VALUE&quot; 
+     FROM &quot;D045495&quot;.&quot;$TA_TWEETS_FTI&quot; 
+    where TA_TYPE in('WeakPositiveSentiment','StrongPositiveSentiment','NeutralSentiment',
+       'WeakNegativeSentiment','StrongNegativeSentiment','MajorProblem','MinorProblem')
+    GROUP BY &quot;TA_TYPE&quot;
+) AS TABLE1,
+
+(
+SELECT SUM(&quot;TA_COUNTER&quot;) AS &quot;TOTAL_SENTIMENT_VALAUE&quot; 
+    FROM &quot;D045495&quot;.&quot;$TA_TWEETS_FTI&quot; 
+    where TA_TYPE in('WeakPositiveSentiment','StrongPositiveSentiment','NeutralSentiment',
+       'WeakNegativeSentiment','StrongNegativeSentiment','MajorProblem','MinorProblem')
+) AS TABLE2;
+
+END /********* End Procedure Script ************/</definition>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Script_View">
+  <attributes/>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="TA_TYPE" order="1" aggregationType="count" measureType="simple">
+      <descriptions defaultDescription="COL"/>
+      <measureMapping columnObjectName="Script_View" columnName="TA_TYPE"/>
+    </measure>
+  
+    <measure id="SENTIMENT_VALAUE_PERCENTAGE" order="2" aggregationType="sum" measureType="simple">
+      <descriptions defaultDescription="COL"/>
+      <measureMapping columnObjectName="Script_View" columnName="SENTIMENT_VALAUE_PERCENTAGE"/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

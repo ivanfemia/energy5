@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:clearspace="http://www.jivesoftware.com/xmlns/clearspace/rss" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>Energy5</title>
+    <link>http://scn.sap.com/community/developer-center/hana</link>
+    <description>All Content in SAP HANA Developer Center</description>
+    <language>en</language>
+    <pubDate>Mon, 09 Nov 2015 11:09:45 GMT</pubDate>
+    <generator>Jive Engage 5.0.6.2  (http://jivesoftware.com/products/)</generator>
+    <dc:date>2015-11-09T11:09:45Z</dc:date>
+    <dc:language>en</dc:language>
+    <item>
+      <title>Tweet to hashtag #Engergy5 and change the sentiment score</title>
+      <link>http://scn.sap.com/thread/3823670</link>
+      <description>Help to change our sentiment score</description>
+      <pubDate>Mon, 09 Nov 2015 11:09:45 GMT</pubDate>
+      <guid>http://scn.sap.com/thread/3823670</guid>
+      <dc:creator>Ram Lokeswara</dc:creator>
+      <dc:date>2015-11-09T11:09:45Z</dc:date>
+      <clearspace:dateToText>Less than a minute ago</clearspace:dateToText>
+      <clearspace:objectType>0</clearspace:objectType>
+    </item>
+  </channel>
+</rss>
+

@@ -1,0 +1,15 @@
+{
+                "d": {
+                               "icon": "sap-icon://factory",
+                               "info": "Less than 3",
+                               "infoState": "Positive",
+                               "number": 2,
+                               "numberDigits": 0,
+                               "numberFactor": "",
+                               "numberState": "Positive",
+                               "numberUnit": "",
+                               "stateArrow": "Down",
+                               "subtitle": "Current Quater",
+                               "title": "Power Plant Outages"
+                     }
+}

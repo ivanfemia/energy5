@@ -1,0 +1,15 @@
+{
+                "d": {
+                               "icon": "sap-icon://money-bills",
+                               "info": "More than 10%",
+                               "infoState": "Negative",
+                               "number": 13,
+                               "numberDigits": 0,
+                               "numberFactor": "%",
+                               "numberState": "Negative",
+                               "numberUnit": "%",
+                               "stateArrow": "Up",
+                               "subtitle": "Current Status",
+                               "title": "Overdue Invoices"
+                     }
+}
